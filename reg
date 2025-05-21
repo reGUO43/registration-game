@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Регистрация</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin-bottom: 10px; display: block; width: 300px; }
+    #result { margin-top: 20px; color: red; font-weight: bold; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Регистрация</h1>
+  <form id="regForm">
+    Ваш возраст: <input type="number" id="age" required>
+    Ваш вес (кг): <input type="number" id="weight" required>
+    Ваш рост (см): <input type="number" id="height" required>
+    Придумайте пароль (30 символов): <input type="text" id="password" maxlength="30" required>
+    Ваше имя: <input type="text" id="name" required>
+    Ваша фамилия: <input type="text" id="surname" required>
+    Сколько у вас братьев: <input type="number" id="brothers" required>
+    Ваша страна: <input type="text" id="country" required>
+    Место в Нью-Йорке (англ.): <input type="text" id="nyplace" required>
+
+    <p><b>Математика:</b> <span id="mathQuestion"></span></p>
+    Ответ: <input type="number" id="mathAnswer" required>
+
+    Ссылка на YouTube-видео (ровно 10 минут): <input type="url" id="video" required>
+
+    ID песни из Newgrounds: <input type="text" id="songId" required>
+    <a href="https://www.newgrounds.com/audio" target="_blank">Открыть Newgrounds Audio</a>
+
+    Название марки машины: <input type="text" id="carBrand" required>
+    Имя известного человека: <input type="text" id="famousPerson" required>
+
+    <p><b>Случайное место на Google Планете Земля:</b></p>
+    <button type="button" onclick="generateEarth()">Показать место</button>
+    <div id="earthBox" class="hidden">
+      <p>Открой: <a href="#" id="earthLink" target="_blank"></a></p>
+      В какой это стране?: <input type="text" id="earthCountry" required>
+    </div>
+
+    <button type="submit">Зарегистрироваться</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const mathQ = document.getElementById("mathQuestion");
+    const earthBox = document.getElementById("earthBox");
+    const earthLink = document.getElementById("earthLink");
+
+    // Случайный математический пример
+    const num1 = Math.floor(Math.random() * 50 + 1);
+    const num2 = Math.floor(Math.random() * 50 + 1);
+    const correctMathAnswer = num1 + num2;
+    mathQ.textContent = `${num1} + ${num2} = ?`;
+
+    // Случайные локации для Google Earth
+    const earthPlaces = [
+      {
+        link: "https://earth.google.com/web/@40.748817,-73.985428,150a,35y,90t", // Нью-Йорк
+        country: "сша"
+      },
+      {
+        link: "https://earth.google.com/web/@48.858370,2.294481,150a,30y,90t", // Париж
+        country: "франция"
+      },
+      {
+        link: "https://earth.google.com/web/@35.658581,139.745433,150a,45y,90t", // Токио
+        country: "япония"
+      },
+      {
+        link: "https://earth.google.com/web/@41.902783,12.496366,150a,30y,90t", // Рим
+        country: "италия"
+      },
+      {
+        link: "https://earth.google.com/web/@-22.906847,-43.172896,150a,40y,90t", // Рио
+        country: "бразилия"
+      }
+    ];
+    let selectedEarthCountry = "";
+
+    function generateEarth() {
+      const place = earthPlaces[Math.floor(Math.random() * earthPlaces.length)];
+      earthLink.href = place.link;
+      earthLink.textContent = place.link;
+      selectedEarthCountry = place.country.toLowerCase();
+      earthBox.classList.remove("hidden");
+    }
+
+    document.getElementById("regForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const age = +document.getElementById("age").value;
+      const weight = +document.getElementById("weight").value;
+      const height = +document.getElementById("height").value;
+      const password = document.getElementById("password").value;
+      const name = document.getElementById("name").value.trim();
+      const surname = document.getElementById("surname").value.trim();
+      const country = document.getElementById("country").value.trim().toLowerCase();
+      const nyplace = document.getElementById("nyplace").value.trim().toLowerCase();
+      const videoURL = document.getElementById("video").value.trim();
+      const songId = document.getElementById("songId").value.trim();
+      const carBrand = document.getElementById("carBrand").value.trim();
+      const famousPerson = document.getElementById("famousPerson").value.trim();
+      const mathAnswer = +document.getElementById("mathAnswer").value;
+      const earthCountry = document.getElementById("earthCountry").value.trim().toLowerCase();
+
+      const bannedCountries = ["китай", "россия", "сша"];
+      const smallCountries = ["ватикан", "монако", "сан-марино", "лихтенштейн", "андорра"];
+      const realNyPlaces = ["central park", "times square", "empire state building", "brooklyn bridge", "statue of liberty"];
+
+      let message = "";
+
+      if (age < 18) message += "Вы несовершеннолетний! ";
+      if (age > 30) message += "Вы слишком старые! ";
+      if (weight > 100) message += "Слишком толстый! ";
+      if (height < 120) message += "Слишком низкий! ";
+      if (password.length < 30) message += "Пароль должен быть ровно 30 символов! ";
+      if (name.length < 3) message += "У вас короткое имя! ";
+      if (surname.length < 3) message += "У вас короткая фамилия! ";
+      if (bannedCountries.includes(country)) {
+        message += "Эта страна заблокирована! ";
+      } else if (smallCountries.includes(country)) {
+        message += "Страна слишком маленькая! ";
+      } else if (!country.match(/^[a-zа-яё -]+$/i)) {
+        message += "Не существует такой нации!! ";
+      }
+
+      const foundPlace = realNyPlaces.some(place => nyplace === place.toLowerCase());
+      if (!foundPlace) {
+        message += "Место в Нью-Йорке указано неверно! -_- ";
+      }
+
+      if (mathAnswer !== correctMathAnswer) {
+        message += "Неправильный ответ на пример! ";
+      }
+
+      const videoID = videoURL.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+      if (videoID && videoID[1]) {
+        const apiURL = `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoID[1]}`;
+        try {
+          const response = await fetch(apiURL);
+          const data = await response.json();
+          if (!data || !data.duration || data.duration !== 600) {
+            message += "Видео должно быть ровно 10 минут! ";
+          }
+        } catch {
+          message += "Ошибка при проверке видео! ";
+        }
+      } else {
+        message += "Неверная ссылка на видео! ";
+      }
+
+      if (!songId.match(/^\d+$/)) {
+        message += "Неверный ID песни из Newgrounds! ";
+      }
+
+      if (carBrand.length < 3) {
+        message += "Марка машины слишком короткая! ";
+      }
+
+      if (famousPerson.length < 5) {
+        message += "Имя известного человека слишком короткое! ";
+      }
+
+      if (selectedEarthCountry && earthCountry !== selectedEarthCountry) {
+        message += "Неправильная страна для места из Google Earth! ";
+      }
+
+      const result = document.getElementById("result");
+      if (message) {
+        result.innerText = message;
+      } else {
+        result.innerHTML = 'Регистрация завершена! <br><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Секретная ссылка</a>';
+      }
+    });
+  </script>
+</body>
+</html>
